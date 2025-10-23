@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FoodieHub Chatbot</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h2>Welcome to FoodieHub Restaurant 🍕</h2>
+  <p>Click the chatbot below to order!</p>
+
+  <div id="chatbox">
+    <div id="messages"></div>
+    <div id="inputArea">
+      <input type="text" id="userInput" placeholder="Type your message..." autocomplete="off">
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const userText = document.getElementById("userInput").value;
+      if (!userText.trim()) return;
+
+      const msgContainer = document.getElementById("messages");
+      msgContainer.innerHTML += `<div class='userMsg'>You: ${userText}</div>`;
+
+      const response = await fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: userText})
+      });
+
+      const data = await response.json();
+      msgContainer.innerHTML += `<div class='botMsg'>Bot: ${data.reply}</div>`;
+      document.getElementById("userInput").value = "";
+      msgContainer.scrollTop = msgContainer.scrollHeight;
+    }
+
+    document.getElementById("sendBtn").addEventListener("click", sendMessage);
+    document.getElementById("userInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
